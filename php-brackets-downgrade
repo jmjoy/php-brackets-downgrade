@@ -1,0 +1,71 @@
+#!/usr/bin/php
+<?php
+
+require_once __DIR__ . '/vendor/autoload.php';
+
+if (empty($argv[1])) {
+    fwrite(STDERR, 'Please specify a file path.');
+    return;
+}
+$filepath = $argv[1];
+if (!file_exists($argv[1])) {
+    fwrite(STDERR, 'file not exists.');
+    return;
+}
+$contents = file_get_contents($filepath);
+$tokens = token_get_all($contents);
+$tokens = array_map(function($x) {
+    if (is_array($x)) {
+        $x[] = token_name($x[0]);
+    }
+    return $x;
+}, $tokens);
+
+$closeLevel = 0;
+foreach ($tokens as $i => $token) {
+    if (is_array($token)) {
+        continue;
+    }
+
+    if ($token == '[') {
+        for ($j = $i - 1; $j >= 0; $j -= 1) {
+            // dump($tokens[$j]);
+
+            if (!is_array($tokens[$j])) {
+                $closeLevel += 1;
+                break;
+            }
+            if ($tokens[$j][0] == T_WHITESPACE) {
+                continue;
+            }
+            if ($tokens[$j][0] != T_VARIABLE) {
+                $closeLevel += 1;
+            }
+            break;
+        }
+
+        if ($closeLevel > 0) {
+            $tokens[$i] = 'array(';
+        }
+
+        // dump($closeLevel);
+    }
+
+    if ($token == ']') {
+        if ($closeLevel > 0) {
+            $tokens[$i] = ')';
+            $closeLevel -= 1;
+        }
+
+        // dump($closeLevel);
+    }
+}
+
+$output = implode('', array_map(function($x) {
+    if (is_array($x)) {
+        return $x[1];
+    }
+    return $x;
+}, $tokens));
+
+echo $output . "\n";

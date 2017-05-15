@@ -1,0 +1,18 @@
+{
+    "name": "jmjoy/php-brackets-downgrade",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "jmjoy",
+            "email": "918734043@qq.com"
+        }
+    ],
+    "require": {
+    },
+    "require-dev": {
+        "symfony/var-dumper": "^3.2",
+        "phpunit/phpunit": "^6.1"
+    },
+    "bin": ["php-brackets-downgrade"]
+}
