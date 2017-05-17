@@ -26,8 +26,15 @@ class TheTest extends TestCase {
      * @dataProvider theProvider
      */
     public function testIt($originFile, $expectFile) {
-        $output = shell_exec($this->cmd . $originFile);
-        $this->assertEquals(rtrim($output), rtrim(file_get_contents($expectFile)));
+        $filename = pathinfo($originFile, PATHINFO_FILENAME);
+        $dataPath = __DIR__ .'/data';
+        $tempfilename = "{$dataPath}/tmp/{$filename}.php";
+        copy($originFile, $tempfilename);
+
+        system($this->cmd . $tempfilename);
+        $this->assertEquals(
+            rtrim(file_get_contents($tempfilename)),
+            rtrim(file_get_contents($expectFile)));
     }
 
 }
